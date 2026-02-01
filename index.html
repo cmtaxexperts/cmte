@@ -1,1 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CM Tax Experts | The Compliance Experts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Theme Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#b91c1c',
+            secondary: '#dc2626',
+            bgsoft: '#fef2f2',
+            textdark: '#1e293b',
+            textmuted: '#64748b',
+            borderclr: '#e5e7eb'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body class="bg-bgsoft text-textdark">
+
+  <!-- ================= HEADER ================= -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div>
+        <h1 class="text-xl font-bold text-primary">CM Tax Experts</h1>
+        <p class="text-xs text-textmuted">The Compliance Experts</p>
+      </div>
+      <nav class="space-x-6 text-sm font-medium">
+        <a href="#services" class="hover:text-primary">Services</a>
+        <a href="#clients" class="hover:text-primary">Clients</a>
+        <a href="#contact" class="hover:text-primary">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="bg-bgsoft">
+    <div class="max-w-7xl mx-auto px-6 py-20 text-center">
+      <h2 class="text-5xl font-extrabold mb-6">
+        Professional Tax Consulting You Can Trust
+      </h2>
+      <p class="text-xl text-textmuted max-w-3xl mx-auto mb-8">
+        From first enquiry to final signature — expert guidance at every step.
+      </p>
+      <a href="#contact"
+         class="inline-block bg-primary hover:bg-secondary text-white px-8 py-4 rounded-full font-semibold transition">
+        Schedule Consultation
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= SERVICES ================= -->
+  <section id="services" class="bg-white">
+    <div class="max-w-7xl mx-auto px-6 py-20">
+      <div class="text-center mb-14">
+        <h3 class="text-4xl font-bold mb-3">Our Core Areas</h3>
+        <p class="text-textmuted text-lg">Expert solutions tailored to your needs</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="p-8 border border-borderclr rounded-2xl hover:shadow-lg transition">
+          <h4 class="text-xl font-bold mb-3">Tax Filing & Advisory</h4>
+          <p class="text-textmuted">
+            Strategic tax planning and accurate filing to maximise benefits and ensure compliance.
+          </p>
+        </div>
+
+        <div class="p-8 border border-borderclr rounded-2xl hover:shadow-lg transition">
+          <h4 class="text-xl font-bold mb-3">Business Compliance</h4>
+          <p class="text-textmuted">
+            End-to-end compliance management so you focus on growth, not paperwork.
+          </p>
+        </div>
+
+        <div class="p-8 border border-borderclr rounded-2xl hover:shadow-lg transition">
+          <h4 class="text-xl font-bold mb-3">Accounting & Bookkeeping</h4>
+          <p class="text-textmuted">
+            Secure accounting with real-time insights into your financial health.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section class="bg-primary text-white">
+    <div class="max-w-7xl mx-auto px-6 py-16 text-center">
+      <h3 class="text-3xl font-bold mb-4">
+        Need GST Registration or Returns?
+      </h3>
+      <p class="mb-6 opacity-90">
+        Upload documents securely and let our experts handle the rest.
+      </p>
+      <a href="#"
+         class="inline-block bg-white text-primary px-8 py-3 rounded-full font-semibold">
+        Go to Client Portal
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer id="contact" class="bg-white border-t border-borderclr">
+    <div class="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-3 gap-8 text-sm">
+
+      <div>
+        <h4 class="font-bold mb-2">CM Tax Experts</h4>
+        <p class="text-textmuted">
+          Shakthi Complex, Chokli<br>
+          Kannur, Kerala – 670672
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-bold mb-2">Contact</h4>
+        <p class="text-textmuted">📞 +91 9946 15 11 11</p>
+        <p class="text-textmuted">✉ support@cmtaxexperts.com</p>
+        <p class="text-textmuted">🌐 www.cmtaxexperts.com</p>
+      </div>
+
+      <div>
+        <h4 class="font-bold mb-2">Office Hours</h4>
+        <p class="text-textmuted">Mon – Sat: 9:30 AM – 5:00 PM</p>
+        <p class="text-textmuted">Sunday: Closed</p>
+      </div>
+
+    </div>
+
+    <div class="text-center text-xs text-textmuted pb-6">
+      © 2025 CM Tax Experts. All rights reserved.
+    </div>
+  </footer>
+
+</body>
+</html>
