@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Client Master – CM Tax Experts</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    .box {
+      background: #fff;
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    button {
+      cursor: pointer;
+    }
+    .save {
+      background: #c62828;
+      color: #fff;
+      border: none;
+    }
+    .view {
+      background: #333;
+      color: #fff;
+      border: none;
+    }
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Client Data</h2>
+
+  <input type="text" id="clientName" placeholder="Enter Client Name">
+
+  <button class="save" onclick="saveClient()">Save</button>
+  <button class="view" onclick="viewData()">View Data</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+const scriptURL =
+"https://script.google.com/macros/s/AKfycbw69L5SDLyBvrN3V8TSl80AWeuCoBZO_8a-TGdJ5GM5O3__aK5zQgNRgYvUS04cVk5NqA/exec";
+
+function saveClient() {
+  const name = document.getElementById("clientName").value.trim();
+
+  if (!name) {
+    alert("Please enter Client Name");
+    return;
+  }
+
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify({ clientName: name })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("result").innerHTML =
+      "✅ Saved! Client ID: " + data.clientId;
+    document.getElementById("clientName").value = "";
+  })
+  .catch(err => {
+    document.getElementById("result").innerHTML =
+      "❌ Error saving data";
+    console.error(err);
+  });
+}
+
+function viewData() {
+  window.open(
+    "https://docs.google.com/spreadsheets/d/1Ros5GbHRtJii96FtL-yMJwL22H1yuYrFtVFP5uyKjKw",
+    "_blank"
+  );
+}
+</script>
+
+</body>
+</html>
