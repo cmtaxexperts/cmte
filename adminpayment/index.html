@@ -3,329 +3,327 @@
  <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment Portal - CM Tax Experts</title>
+  <title>CM Tax Payment Portal</title>
   <link rel="icon" type="image/png" href="LOGOFAVICON.png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <style>
-    :root {
-      --primary: #b91c1c;
-      --secondary: #dc2626;
-      --bg: #fef2f2;
-    }
+    :root { --primary: #b91c1c; --bg: #fef2f2; }
     body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); }
     
     .input-field {
         width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 0.5rem;
-        background: #f8fafc; font-size: 0.95rem; outline: none;
+        background: #f8fafc; outline: none;
     }
-    .input-field:focus { border-color: var(--secondary); background: white; }
-    
     .btn {
         width: 100%; padding: 12px; border-radius: 0.75rem; font-weight: bold;
         text-align: center; display: flex; align-items: center; justify-content: center;
         transition: transform 0.1s; cursor: pointer;
     }
     .btn:active { transform: scale(0.98); }
-    
-    .btn-add { background: #eff6ff; color: #1d4ed8; border: 1px dashed #bfdbfe; font-size: 0.9rem; }
     .btn-gen { background: #1e293b; color: white; }
     .btn-wa { background: #25D366; color: white; }
+    .btn-pay { background: linear-gradient(135deg, #b91c1c, #dc2626); color: white; font-size: 1.1rem; box-shadow: 0 4px 12px rgba(185,28,28,0.3); }
 
-    /* Admin Settings Toggle */
-    details > summary { list-style: none; cursor: pointer; outline: none; }
-    details > summary::-webkit-details-marker { display: none; }
-    
-    /* QR Container in Card */
-    #qrcode-container {
-        display: flex; justify-content: center; margin-top: 10px;
-    }
-    #qrcode-container img {
-        border: 4px solid white; border-radius: 8px;
-    }
-
-    /* Floating generated card (Hidden from view) */
-    #receipt-capture-area {
-        position: fixed; top: -9999px; left: -9999px; z-index: -1;
+    /* Receipt Card Design */
+    #receipt-card {
+        background: white; width: 100%; max-width: 400px; padding: 24px; 
+        border-radius: 16px; border-top: 6px solid #b91c1c; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin: 0 auto;
     }
   </style>
  </head>
  <body class="min-h-screen flex flex-col items-center py-6 px-4">
 
-  <div class="text-center mb-5">
-      <img src="LOGOWEBSITE.png" alt="Logo" class="w-16 h-16 mx-auto rounded-xl object-contain shadow-sm mb-2">
-      <h1 class="text-xl font-bold text-gray-800">Payment Portal</h1>
-      <p class="text-xs text-red-700 font-bold uppercase tracking-wide">CM Tax Experts</p>
-  </div>
-
-  <div class="max-w-md w-full bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+  <div id="admin-view" class="w-full max-w-md space-y-4 hidden">
       
-      <details class="bg-gray-50 border-b border-gray-100">
-          <summary class="p-3 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center hover:bg-gray-100">
-              ⚙️ Setup Hidden UPI
-          </summary>
-          <div class="p-4 space-y-3 bg-gray-100">
-              <div>
-                  <label class="block text-xs font-bold text-gray-500 mb-1">Office UPI ID (Hidden)</label>
-                  <input type="text" id="adminUPI" class="input-field text-red-600 font-mono" value="cmtaxexperts@ybl">
-              </div>
-          </div>
-      </details>
+      <div class="text-center mb-4">
+          <img src="LOGOWEBSITE.png" class="w-16 h-16 mx-auto rounded-xl object-contain shadow-sm mb-2">
+          <h1 class="text-xl font-bold text-gray-800">Admin Generator</h1>
+      </div>
 
-      <div class="p-5 space-y-4">
+      <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
           
-          <div class="grid grid-cols-3 gap-3">
-              <div class="col-span-2">
-                  <label class="text-xs font-bold text-gray-500 ml-1">Client Name</label>
-                  <select id="clientSelect" class="input-field" onchange="autoFill()">
-                      <option value="">Select Client</option>
-                      <option value="AJWA BUILDERS" data-id="C40001">AJWA BUILDERS</option>
-                      <option value="TRUEWELL" data-id="C40002">TRUEWELL</option>
-                  </select>
+          <details class="mb-4 bg-red-50 rounded-lg border border-red-100" open>
+              <summary class="p-3 text-xs font-bold text-red-800 uppercase cursor-pointer">⚠️ First Time Setup (Click to Open)</summary>
+              <div class="p-3 pt-0">
+                  <label class="text-[10px] text-gray-500 uppercase font-bold">Paste YOUR Website Link Here:</label>
+                  <input type="text" id="pageUrl" class="input-field border-red-200 text-blue-600" placeholder="https://cmtaxexperts.com/payment.html">
+                  <p class="text-[10px] text-gray-400 mt-1">*Required for the clickable WhatsApp link to work.</p>
               </div>
-              <div class="col-span-1">
-                  <label class="text-xs font-bold text-gray-500 ml-1">ID</label>
-                  <input type="text" id="clientID" class="input-field bg-gray-100" placeholder="ID" readonly>
-              </div>
-          </div>
+          </details>
 
-          <div id="items-container" class="space-y-3">
-              <div class="item-row bg-gray-50 p-3 rounded-lg border border-gray-200 relative">
-                  <div class="mb-2">
-                      <label class="text-xs font-bold text-gray-500">Nature of Payment</label>
-                      <select class="input-field item-nature">
-                          <option value="GST Registration">GST Registration</option>
-                          <option value="GST Return Filing">GST Return Filing</option>
-                          <option value="GST on Rent">GST on Rent</option>
-                          <option value="Income Tax Return Filing">Income Tax Return Filing</option>
-                          <option value="TDS Return Filing">TDS Return Filing</option>
-                          <option value="ESI Return Filing">ESI Return Filing</option>
-                          <option value="EPF Return Filing">EPF Return Filing</option>
-                          <option value="Partnership Firm Registration">Partnership Firm Registration</option>
-                          <option value="Trademark Registration">Trademark Registration</option>
-                          <option value="Trademark Objection">Trademark Objection</option>
-                          <option value="Accounting Fee">Accounting Fee</option>
-                          <option value="Others">Others</option>
+          <div class="space-y-3">
+              <div class="grid grid-cols-3 gap-2">
+                  <div class="col-span-2">
+                      <label class="text-xs font-bold text-gray-500">Client</label>
+                      <select id="clientSelect" class="input-field" onchange="autoFill()">
+                          <option value="">Select...</option>
+                          <option value="AJWA BUILDERS" data-id="C40001">AJWA BUILDERS</option>
+                          <option value="TRUEWELL" data-id="C40002">TRUEWELL</option>
                       </select>
                   </div>
-                  <div class="grid grid-cols-2 gap-3">
-                      <div>
-                          <label class="text-xs font-bold text-gray-500">Period</label>
-                          <input type="month" class="input-field item-period">
-                      </div>
-                      <div>
-                          <label class="text-xs font-bold text-gray-500">Amount (₹)</label>
-                          <input type="number" class="input-field item-amount font-bold text-gray-800" placeholder="0.00" oninput="calcTotal()">
-                      </div>
+                  <div>
+                      <label class="text-xs font-bold text-gray-500">ID</label>
+                      <input type="text" id="clientID" class="input-field bg-gray-50" readonly>
                   </div>
+              </div>
+
+              <div id="items-list" class="space-y-2">
+                  </div>
+              
+              <button onclick="addItem()" class="w-full py-2 border-2 border-dashed border-blue-200 text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-50">+ Add Service</button>
+
+              <div class="flex justify-between items-center pt-3 border-t">
+                  <span class="font-bold text-gray-600">Total:</span>
+                  <span id="adminTotal" class="text-xl font-bold text-red-700">₹0.00</span>
               </div>
           </div>
 
-          <button onclick="addItem()" class="btn btn-add">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-              Add Another Service
-          </button>
-
-          <div>
-              <label class="text-xs font-bold text-gray-500 ml-1">Notes (Optional)</label>
-              <input type="text" id="globalNotes" class="input-field" placeholder="Any specific instructions...">
-          </div>
-
-          <div class="flex justify-between items-center pt-2 border-t border-gray-100">
-              <span class="font-bold text-gray-600">Total Payable:</span>
-              <span id="grandTotalDisplay" class="text-2xl font-bold text-red-700">₹0.00</span>
-          </div>
-
-          <div class="grid grid-cols-1 gap-3 pt-2">
-              <button onclick="generateAndDownload()" class="btn btn-gen">
-                  1. Download Receipt Image
-              </button>
-              <a href="#" id="waLink" class="btn btn-wa opacity-50 pointer-events-none">
-                  <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                  2. Send via WhatsApp (Attach Img)
-              </a>
+          <div class="mt-6 space-y-3">
+              <button onclick="generateEverything()" class="btn btn-gen">1. Generate Link & Receipt</button>
+              
+              <div id="result-area" class="hidden space-y-3">
+                  <p class="text-center text-xs text-green-600 font-bold">✅ Generated Successfully!</p>
+                  <button onclick="downloadImage()" class="btn bg-gray-800 text-white text-sm">2. Download Receipt Image</button>
+                  <a id="wa-btn" href="#" class="btn btn-wa text-sm">3. Send Clickable Link (WhatsApp)</a>
+              </div>
           </div>
       </div>
   </div>
 
-  <div id="receipt-capture-area">
-      <div id="receipt-card" class="bg-white p-6 w-[400px] rounded-none">
-          
-          <div class="w-full h-2 bg-red-700 mb-6"></div>
 
-          <div class="text-center mb-6">
-              <h2 class="text-2xl font-bold text-gray-800">CM Tax Experts</h2>
-              <p class="text-sm text-red-600 font-bold uppercase tracking-widest mt-1">PAYMENT REQUEST</p>
-          </div>
-          
-          <hr class="border-gray-100 mb-4">
-
-          <div class="mb-6">
-              <p class="text-gray-500 text-sm">Client: <span class="font-bold text-gray-800 text-base" id="cardClient">--</span></p>
-              <p class="text-gray-500 text-sm">ID: <span class="font-bold text-gray-800 text-base" id="cardID">--</span></p>
+  <div id="client-view" class="w-full max-w-md hidden">
+      
+      <div id="receipt-card">
+          <div class="flex items-center justify-between border-b pb-4 mb-4">
+              <div>
+                  <h2 class="text-xl font-extrabold text-gray-800">CM Tax Experts</h2>
+                  <p class="text-[10px] text-red-600 font-bold uppercase tracking-widest">Payment Request</p>
+              </div>
+              <img src="LOGOWEBSITE.png" class="w-12 h-12 object-contain">
           </div>
 
-          <div id="cardList" class="space-y-3 text-sm text-gray-700 mb-6">
+          <div class="space-y-1 mb-6 text-sm">
+              <div class="flex"><span class="w-20 text-gray-500">Client:</span> <span class="font-bold text-gray-800" id="cardClient">--</span></div>
+              <div class="flex"><span class="w-20 text-gray-500">ID:</span> <span class="font-bold text-gray-800" id="cardID">--</span></div>
+          </div>
+
+          <div id="cardItems" class="space-y-2 mb-6 text-sm text-gray-700">
               </div>
 
-          <div class="bg-gray-50 p-4 rounded-lg flex justify-between items-center mb-8">
+          <div class="flex justify-between items-center bg-gray-50 p-4 rounded-xl mb-6">
               <span class="font-bold text-gray-600">Total Payable</span>
               <span class="font-bold text-2xl text-red-700" id="cardTotal">₹0.00</span>
           </div>
 
-          <div class="text-center">
-              <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-2">SCAN TO PAY VIA UPI</p>
-              <div id="qrcode-container"></div> </div>
+          <div class="text-center bg-white p-2">
+              <div id="qrcode" class="flex justify-center mb-2"></div>
+              <p class="text-[10px] text-gray-400 uppercase tracking-widest">Scan with any UPI App</p>
+          </div>
 
-          <p class="text-center text-[10px] text-gray-400 mt-6">Please share payment screenshot after transfer.</p>
+          <div id="pay-button-container" class="mt-6 pt-4 border-t border-dashed hidden">
+              <a id="final-pay-link" href="#" class="btn btn-pay pulse-animation">
+                  Click Here to Pay Now
+              </a>
+              <p class="text-center text-xs text-gray-400 mt-2">Securely via UPI</p>
+          </div>
       </div>
+      
+      <p id="client-footer" class="text-center text-xs text-gray-400 mt-8 hidden">
+          © 2026 CM Tax Experts.
+      </p>
   </div>
 
+
   <script>
-      function autoFill() {
-          const select = document.getElementById('clientSelect');
-          const inputID = document.getElementById('clientID');
-          const selectedOption = select.options[select.selectedIndex];
-          inputID.value = selectedOption.value ? selectedOption.getAttribute('data-id') : '';
-      }
+    // --- 0. CONFIGURATION ---
+    const ADMIN_UPI = "cmtaxexperts@ybl"; 
+    
+    // --- 1. INITIALIZATION ---
+    window.onload = function() {
+        // Check if this is Admin or Client based on URL parameters
+        const params = new URLSearchParams(window.location.search);
+        
+        if(params.has('data')) {
+            // CLIENT MODE
+            showClientMode(params.get('data'));
+        } else {
+            // ADMIN MODE
+            document.getElementById('admin-view').classList.remove('hidden');
+            document.getElementById('client-view').classList.add('hidden'); // We show it briefly later for image gen
+            addItem(); // Add first empty row
+            
+            // Auto-detect URL if possible
+            if(!document.getElementById('pageUrl').value) {
+                document.getElementById('pageUrl').value = window.location.href.split('?')[0];
+            }
+        }
+    };
 
-      function addItem() {
-          const container = document.getElementById('items-container');
-          const newRow = document.createElement('div');
-          newRow.className = 'item-row bg-gray-50 p-3 rounded-lg border border-gray-200 relative mt-3';
-          newRow.innerHTML = `
-              <button onclick="this.parentElement.remove(); calcTotal();" class="absolute top-2 right-2 text-red-400 hover:text-red-600">✕</button>
-              <div class="mb-2">
-                  <label class="text-xs font-bold text-gray-500">Nature of Payment</label>
-                  <select class="input-field item-nature">
-                      <option value="GST Registration">GST Registration</option>
-                      <option value="GST Return Filing">GST Return Filing</option>
-                      <option value="GST on Rent">GST on Rent</option>
-                      <option value="Income Tax Return Filing">Income Tax Return Filing</option>
-                      <option value="TDS Return Filing">TDS Return Filing</option>
-                      <option value="ESI Return Filing">ESI Return Filing</option>
-                      <option value="EPF Return Filing">EPF Return Filing</option>
-                      <option value="Partnership Firm Registration">Partnership Firm Registration</option>
-                      <option value="Trademark Registration">Trademark Registration</option>
-                      <option value="Trademark Objection">Trademark Objection</option>
-                      <option value="Accounting Fee">Accounting Fee</option>
-                      <option value="Others">Others</option>
-                  </select>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                  <div>
-                      <label class="text-xs font-bold text-gray-500">Period</label>
-                      <input type="month" class="input-field item-period">
-                  </div>
-                  <div>
-                      <label class="text-xs font-bold text-gray-500">Amount (₹)</label>
-                      <input type="number" class="input-field item-amount font-bold text-gray-800" placeholder="0.00" oninput="calcTotal()">
-                  </div>
-              </div>
-          `;
-          container.appendChild(newRow);
-      }
+    // --- 2. ADMIN LOGIC ---
+    function autoFill() {
+        const sel = document.getElementById('clientSelect');
+        const opt = sel.options[sel.selectedIndex];
+        document.getElementById('clientID').value = opt.getAttribute('data-id') || "";
+    }
 
-      function calcTotal() {
-          let total = 0;
-          document.querySelectorAll('.item-amount').forEach(input => {
-              if(input.value) total += parseFloat(input.value);
-          });
-          document.getElementById('grandTotalDisplay').innerText = "₹" + total.toFixed(2);
-          return total;
-      }
+    function addItem() {
+        const div = document.createElement('div');
+        div.className = 'item-row bg-gray-50 p-2 rounded border flex gap-2 items-center';
+        div.innerHTML = `
+            <div class="w-full">
+                <select class="input-field text-xs p-1 mb-1 item-nature">
+                    <option>GST Return Filing</option>
+                    <option>Trademark Objection</option>
+                    <option>GST Registration</option>
+                    <option>Income Tax Return</option>
+                    <option>Accounting Fee</option>
+                    <option>Other</option>
+                </select>
+                <div class="flex gap-1">
+                    <input type="month" class="input-field text-xs p-1 item-period">
+                    <input type="number" class="input-field text-xs p-1 font-bold item-amt" placeholder="0.00" oninput="calcTotal()">
+                </div>
+            </div>
+            <button onclick="this.parentElement.remove();calcTotal()" class="text-red-500 font-bold px-2">×</button>
+        `;
+        document.getElementById('items-list').appendChild(div);
+    }
 
-      function generateAndDownload() {
-          const clientName = document.getElementById('clientSelect').value || "Client";
-          const clientID = document.getElementById('clientID').value || "--";
-          const adminUPI = document.getElementById('adminUPI').value;
-          const total = calcTotal().toFixed(2);
+    function calcTotal() {
+        let t = 0;
+        document.querySelectorAll('.item-amt').forEach(i => t += parseFloat(i.value || 0));
+        document.getElementById('adminTotal').innerText = "₹" + t.toFixed(2);
+        return t.toFixed(2);
+    }
 
-          if(total <= 0) { alert("Please enter an amount."); return; }
+    // --- 3. GENERATION LOGIC ---
+    function generateEverything() {
+        const total = calcTotal();
+        if(total <= 0) return alert("Please enter amount");
 
-          // 1. Build List & UPI String
-          let cardHtml = "";
-          let waDetails = "";
-          let narrationArr = [];
+        // Gather Data
+        const client = document.getElementById('clientSelect').value || "Client";
+        const id = document.getElementById('clientID').value || "";
+        
+        let items = [];
+        let narrationList = [];
 
-          document.querySelectorAll('.item-row').forEach(row => {
-              const nature = row.querySelector('.item-nature').value;
-              const period = row.querySelector('.item-period').value;
-              const amt = parseFloat(row.querySelector('.item-amount').value || 0).toFixed(2);
+        document.querySelectorAll('.item-row').forEach(r => {
+            const nature = r.querySelector('.item-nature').value;
+            const period = r.querySelector('.item-period').value;
+            const amt = parseFloat(r.querySelector('.item-amt').value || 0).toFixed(2);
+            if(amt > 0) {
+                let pStr = period ? `(${period})` : "";
+                items.push({ n: nature, p: pStr, a: amt });
+                narrationList.push(nature);
+            }
+        });
 
-              if(amt > 0) {
-                  let periodStr = "";
-                  if(period) {
-                      const d = new Date(period + "-01");
-                      periodStr = `(${d.toLocaleString('default', { month: 'short', year: 'numeric' })})`;
-                  }
-                  
-                  // Add to Receipt Card HTML
-                  cardHtml += `
-                      <div class="flex justify-between items-center">
-                          <span>${nature} <span class="text-gray-400 text-xs">${periodStr}</span></span>
-                          <span class="font-bold">₹${amt}</span>
-                      </div>`;
-                  
-                  // Add to WhatsApp Text
-                  waDetails += `${nature} ${periodStr} - Rs.${amt}/-\n`;
-                  
-                  narrationArr.push(nature);
-              }
-          });
+        // Create Encoded Data Package
+        const payload = {
+            c: client,
+            i: id,
+            t: total,
+            l: items
+        };
+        const encodedData = btoa(JSON.stringify(payload)); // Base64 encode
 
-          // 2. Populate Hidden Card
-          document.getElementById('cardClient').innerText = clientName;
-          document.getElementById('cardID').innerText = clientID;
-          document.getElementById('cardList').innerHTML = cardHtml;
-          document.getElementById('cardTotal').innerText = "₹" + total;
+        // Render Card for Image Capture
+        renderCard(payload);
+        
+        // Show Card temporarily
+        const cardContainer = document.getElementById('client-view');
+        cardContainer.classList.remove('hidden');
+        
+        // Generate Link
+        const baseUrl = document.getElementById('pageUrl').value;
+        const fullLink = `${baseUrl}?data=${encodedData}`;
 
-          // 3. Generate Local QR Code
-          let narration = narrationArr.join(", ");
-          if(narration.length > 30) narration = narration.substring(0, 27) + "..."; // Shorten for UPI limits
-          
-          const upiLink = `upi://pay?pa=${adminUPI}&pn=CM%20Tax%20Experts&cu=INR&am=${total}&tn=${encodeURIComponent(narration)}`;
-          
-          // Clear old QR and make new one locally
-          const qrContainer = document.getElementById('qrcode-container');
-          qrContainer.innerHTML = ""; 
-          new QRCode(qrContainer, {
-              text: upiLink,
-              width: 160,
-              height: 160,
-              colorDark : "#000000",
-              colorLight : "#ffffff",
-              correctLevel : QRCode.CorrectLevel.H
-          });
+        // Setup WhatsApp Button
+        const waMsg = `*Payment Request from CM Tax Experts*\n\nClient: *${client}*\nID: ${id}\nTotal: *₹${total}*\n\nClick here to Pay:\n${fullLink}`;
+        document.getElementById('wa-btn').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(waMsg)}`;
 
-          // 4. Capture & Download Image
-          // Allow small delay for QR rendering
-          setTimeout(() => {
-              const cardElement = document.getElementById('receipt-card');
-              html2canvas(cardElement, { scale: 2 }).then(canvas => {
-                  const link = document.createElement('a');
-                  link.download = `Payment_${clientName.replace(/\s/g, '_')}.png`;
-                  link.href = canvas.toDataURL();
-                  link.click();
+        document.getElementById('result-area').classList.remove('hidden');
+        
+        // Scroll to card to see preview
+        cardContainer.scrollIntoView({behavior: "smooth"});
+    }
 
-                  // 5. Setup WhatsApp Link
-                  const waBtn = document.getElementById('waLink');
-                  waBtn.classList.remove('opacity-50', 'pointer-events-none');
-                  
-                  let msg = `*Payment Request From CM Tax Experts*\n\n`;
-                  msg += `Client Name: *${clientName}*\n`;
-                  msg += `Client ID: ${clientID}\n\n`;
-                  msg += `*Payment Details:*\n`;
-                  msg += waDetails;
-                  msg += `\n*Total - Rs.${total}/-*\n\n`;
-                  msg += `Click here to Pay:\n${upiLink}`;
-                  
-                  waBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-              });
-          }, 300);
-      }
+    // --- 4. RENDER & CLIENT MODE ---
+    function renderCard(data) {
+        document.getElementById('cardClient').innerText = data.c;
+        document.getElementById('cardID').innerText = data.i;
+        document.getElementById('cardTotal').innerText = "₹" + data.t;
+
+        // Render Items
+        let html = "";
+        let narration = "";
+        data.l.forEach(item => {
+            html += `<div class="flex justify-between border-b border-gray-100 pb-1 mb-1 last:border-0">
+                <span>${item.n} <span class="text-xs text-gray-400">${item.p}</span></span>
+                <span class="font-bold">₹${item.a}</span>
+            </div>`;
+            narration += item.n + ", ";
+        });
+        document.getElementById('cardItems').innerHTML = html;
+
+        // Generate QR
+        if(narration.length > 30) narration = narration.substring(0, 27) + "...";
+        const upiLink = `upi://pay?pa=${ADMIN_UPI}&pn=CM%20Tax%20Experts&cu=INR&am=${data.t}&tn=${encodeURIComponent(narration)}`;
+        
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById('qrcode'), {
+            text: upiLink,
+            width: 150, height: 150,
+            colorDark: "#000000", colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.M
+        });
+
+        // Setup Pay Button (For Client View Only)
+        document.getElementById('final-pay-link').href = upiLink;
+    }
+
+    function showClientMode(encodedData) {
+        try {
+            const data = JSON.parse(atob(encodedData));
+            
+            // Hide Admin, Show Client
+            document.getElementById('admin-view').classList.add('hidden');
+            document.getElementById('client-view').classList.remove('hidden');
+            
+            // Render
+            renderCard(data);
+            
+            // Show Pay Button & Footer
+            document.getElementById('pay-button-container').classList.remove('hidden');
+            document.getElementById('client-footer').classList.remove('hidden');
+
+        } catch(e) {
+            alert("Invalid Payment Link");
+            window.location.href = window.location.href.split('?')[0]; // Go back to admin
+        }
+    }
+
+    // --- 5. IMAGE DOWNLOAD ---
+    function downloadImage() {
+        // Hide the Pay Button for the image
+        document.getElementById('pay-button-container').classList.add('hidden');
+        
+        const card = document.getElementById('receipt-card');
+        html2canvas(card, { scale: 2 }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'Payment_Receipt.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            
+            // Restore Pay Button if we are in Client Mode (optional logic, but safe to leave hidden in Admin view)
+        });
+    }
+
   </script>
  </body>
 </html>
