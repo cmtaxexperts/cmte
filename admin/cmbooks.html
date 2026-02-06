@@ -2,328 +2,295 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CM Books - Accounting</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - CM Tax Experts</title>
     <link rel="icon" type="image/png" href="https://cmtaxexperts.com/LOGOFAVICON.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f3f4f6; }
+        .login-bg { background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%); }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid #b91c1c; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        tbody tr:hover { background-color: #fff1f2; }
+        .dash-card { transition: all 0.3s ease; }
+        .dash-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .mobile-scroll { -webkit-overflow-scrolling: touch; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col font-sans text-slate-800">
+<body class="text-slate-800 h-screen overflow-hidden flex flex-col">
 
-    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center cursor-pointer" onclick="window.location.href='/admin/dashboard.html'">
-                    <img src="https://cmtaxexperts.com/LOGOWEBSITE.png" alt="Logo" class="h-10 w-10 rounded mr-3">
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-900">CM Books</h1>
-                        <p class="text-xs text-red-700 font-bold uppercase">Accounts Manager</p>
+    <div id="loginScreen" class="fixed inset-0 z-50 login-bg flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+            <img src="https://cmtaxexperts.com/LOGOWEBSITE.png" class="w-20 h-20 mx-auto rounded-xl mb-4 shadow-md">
+            <h1 class="text-2xl font-bold text-gray-800">CM Experts Group</h1>
+            <p class="text-sm text-gray-500 mb-6">Internal Management System</p>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div class="relative">
+                    <i class="fas fa-user absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" id="username" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-600 bg-gray-50" placeholder="Username" required>
+                </div>
+                <div class="relative">
+                    <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                    <input type="password" id="password" class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-red-600 bg-gray-50" placeholder="Password" required>
+                </div>
+                <button type="submit" class="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-3 rounded-xl shadow-lg transition transform active:scale-95">Login securely</button>
+            </form>
+            <p id="loginError" class="text-red-500 text-xs mt-3 hidden"><i class="fas fa-exclamation-circle"></i> Invalid Credentials</p>
+        </div>
+    </div>
+
+    <div id="mainApp" class="hidden flex-col h-full">
+        <nav class="bg-white shadow-sm border-b border-gray-200 z-40">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center cursor-pointer" onclick="showSection('dashboard')">
+                        <img src="https://cmtaxexperts.com/LOGOWEBSITE.png" class="h-9 w-9 rounded mr-3">
+                        <div>
+                            <h1 class="text-lg font-bold text-gray-900 leading-tight">CM Experts</h1>
+                            <p class="text-[10px] text-red-600 font-bold uppercase tracking-wider">Dashboard</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <button onclick="logout()" class="text-gray-400 hover:text-red-600 p-2 transition"><i class="fas fa-sign-out-alt text-xl"></i></button>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="openModal('add')" class="bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center shadow-md transition">
-                        <i class="fas fa-plus mr-2"></i> New Entry
-                    </button>
+            </div>
+        </nav>
+
+        <main class="flex-grow overflow-y-auto bg-gray-50 mobile-scroll p-4 relative">
+            <div id="section-dashboard" class="max-w-5xl mx-auto space-y-6 animate-fade-in">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div onclick="showSection('clientData')" class="dash-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 cursor-pointer flex flex-col items-center justify-center text-center h-32 md:h-40">
+                        <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-3 text-red-600"><i class="fas fa-users text-xl"></i></div>
+                        <h3 class="font-bold text-gray-700 text-sm">Client Data</h3>
+                    </div>
+                    <div onclick="window.location.href='/admin/cmbooks.html'" class="dash-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 cursor-pointer flex flex-col items-center justify-center text-center h-32 md:h-40">
+                        <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-3 text-green-600"><i class="fas fa-calculator text-xl"></i></div>
+                        <h3 class="font-bold text-gray-700 text-sm">Accounts</h3>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
 
-    <main class="flex-grow max-w-[98%] mx-auto py-6 w-full">
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-green-500 flex justify-between items-center">
-                <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">Total Income</p>
-                    <h3 class="text-2xl font-bold text-gray-800" id="dispIncome">₹0.00</h3>
+            <div id="section-clientData" class="hidden max-w-7xl mx-auto h-full flex flex-col">
+                <div class="bg-white p-4 rounded-xl shadow-sm mb-4 flex flex-col md:flex-row gap-4 justify-between items-center sticky top-0 z-30">
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <button onclick="showSection('dashboard')" class="p-2 text-gray-400 hover:text-gray-800"><i class="fas fa-arrow-left"></i></button>
+                        <h2 class="font-bold text-lg">Client Data</h2>
+                    </div>
+                    <div class="relative w-full md:w-80">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-sm"></i>
+                        <input type="text" id="clientSearch" placeholder="Search Clients..." class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-red-500 focus:outline-none">
+                    </div>
+                    <button onclick="openClientModal('add')" class="w-full md:w-auto bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-sm transition">+ Add Client</button>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600"><i class="fas fa-arrow-down"></i></div>
-            </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-red-500 flex justify-between items-center">
-                <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">Total Expense</p>
-                    <h3 class="text-2xl font-bold text-gray-800" id="dispExpense">₹0.00</h3>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex-grow relative">
+                    <div class="overflow-auto absolute inset-0">
+                        <table class="min-w-full divide-y divide-gray-100">
+                            <thead class="bg-gray-50 sticky top-0 z-20">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">ID</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Name/Branch</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Contact</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Tax Info</th>
+                                    <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Drive</th>
+                                    <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientTableBody" class="bg-white divide-y divide-gray-50 text-sm">
+                                <tr><td colspan="6" class="p-8 text-center"><div class="inline-block loader"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600"><i class="fas fa-arrow-up"></i></div>
             </div>
-            <div class="bg-white p-5 rounded-xl shadow-sm border-l-4 border-blue-500 flex justify-between items-center">
-                <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase">Net Balance</p>
-                    <h3 class="text-2xl font-bold text-gray-800" id="dispBalance">₹0.00</h3>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><i class="fas fa-wallet"></i></div>
-            </div>
-        </div>
+        </main>
+    </div>
 
-        <div class="bg-white rounded-xl shadow-sm p-4 mb-4 border border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div class="relative w-full md:w-96">
-                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                <input type="text" id="searchInput" placeholder="Search Client, Particulars, Category..." class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-full focus:outline-none focus:border-red-500 transition">
+    <div id="clientModal" class="fixed inset-0 z-[60] hidden">
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeClientModal()"></div>
+        <div class="absolute inset-x-0 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-white md:rounded-2xl rounded-t-2xl shadow-2xl w-full md:w-[800px] max-h-[90vh] overflow-y-auto flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-gray-800" id="modalTitle">Add Client</h3>
+                <button onclick="closeClientModal()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:text-red-600"><i class="fas fa-times"></i></button>
             </div>
-            <div class="flex gap-2 w-full md:w-auto">
-                <select id="filterType" class="p-2 border border-gray-200 rounded-lg text-sm" onchange="applyFilters()">
-                    <option value="All">All Types</option>
-                    <option value="Income">Income</option>
-                    <option value="Expense">Expense</option>
-                </select>
-                <div class="text-sm text-gray-500 font-medium bg-gray-100 px-3 py-2 rounded-lg whitespace-nowrap" id="recordCount">Loading...</div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div class="overflow-x-auto max-h-[70vh]">
-                <table class="min-w-full divide-y divide-gray-200 relative">
-                    <thead class="bg-gray-50 sticky top-0 z-10 shadow-sm">
-                        <tr>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Date</th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Particulars / Client</th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Category</th>
-                            <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Type</th>
-                            <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">Amount</th>
-                            <th class="px-4 py-3 text-center text-xs font-bold text-gray-500 uppercase">Doc</th>
-                            <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="bg-white divide-y divide-gray-200 text-sm">
-                        <tr><td colspan="7" class="px-6 py-10 text-center"><div class="flex justify-center"><div class="loader"></div></div></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <div id="entryModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 flex items-center justify-center backdrop-blur-sm overflow-y-auto">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl m-4 relative">
-            
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 rounded-t-xl">
-                <h3 class="text-lg font-bold text-gray-800" id="modalTitle">New Entry</h3>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-red-600 transition"><i class="fas fa-times text-xl"></i></button>
-            </div>
-
-            <form id="entryForm" class="p-6 space-y-4">
+            <form id="clientForm" class="p-6 space-y-4">
                 <input type="hidden" id="rowIndex">
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Date</label>
-                        <input type="date" id="Date" name="Date" class="w-full p-2 border border-gray-300 rounded-lg" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Transaction Type</label>
-                        <select id="Txn_Type" name="Txn_Type" class="w-full p-2 border border-gray-300 rounded-lg" required>
-                            <option value="Income">Income (Credit)</option>
-                            <option value="Expense">Expense (Debit)</option>
-                        </select>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Client ID</label><input type="text" id="Client_ID" name="Client_ID" class="w-full p-2 bg-gray-100 border border-gray-200 rounded-lg text-red-700 font-mono font-bold" readonly></div>
+                    <div class="md:col-span-2"><label class="text-xs font-bold text-gray-500 uppercase">Client Name *</label><input type="text" id="Client_Name" name="Client_Name" class="w-full p-2 border border-gray-300 rounded-lg focus:border-red-500 focus:outline-none" required></div>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Client Name (Optional)</label>
-                    <input type="text" id="Client_Name" name="Client_Name" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="e.g. AJWA Builders">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Branch</label><select id="Branch" name="Branch" class="w-full p-2 border border-gray-300 rounded-lg bg-white"><option value="CMTE">CMTE</option><option value="ACT">ACT</option><option value="CMbooks">CMbooks</option></select></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Constitution</label><select id="Constitution" name="Constitution" class="w-full p-2 border border-gray-300 rounded-lg bg-white"><option value="Individual">Individual</option><option value="Proprietorship">Proprietorship</option><option value="Partnership">Partnership</option><option value="LLP">LLP</option><option value="Private Limited">Pvt Ltd</option></select></div>
+                    <div class="col-span-2 md:col-span-1"><label class="text-xs font-bold text-gray-500 uppercase">Reference</label><input type="text" id="Reference" name="Reference" class="w-full p-2 border border-gray-300 rounded-lg"></div>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Particulars / Description *</label>
-                    <input type="text" id="Particulars" name="Particulars" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="e.g. GST Filing Fees August" required>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Legal Name</label><input type="text" id="Legal_Name" name="Legal_Name" class="w-full p-2 border border-gray-300 rounded-lg"></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">DOB / Incorp Date</label><input type="date" id="DOB" name="DOB" class="w-full p-2 border border-gray-300 rounded-lg"></div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Category</label>
-                        <select id="Category" name="Category" class="w-full p-2 border border-gray-300 rounded-lg">
-                            <option value="Professional Fees">Professional Fees</option>
-                            <option value="Govt Fees">Govt Fees</option>
-                            <option value="Office Expense">Office Expense</option>
-                            <option value="Salary">Salary</option>
-                            <option value="Utility Bills">Utility Bills</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Amount (₹) *</label>
-                        <input type="number" id="Amount" name="Amount" class="w-full p-2 border border-gray-300 rounded-lg font-bold" step="0.01" required>
-                    </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div><label class="text-xs font-bold text-gray-500">PAN NO</label><input type="text" id="Pan_No" name="Pan_No" class="w-full p-2 border border-gray-300 rounded bg-white uppercase font-mono text-sm"></div>
+                    <div><label class="text-xs font-bold text-gray-500">AADHAAR NO</label><input type="text" id="Adhar_No" name="Adhar_No" class="w-full p-2 border border-gray-300 rounded bg-white font-mono text-sm"></div>
+                    <div><label class="text-xs font-bold text-gray-500">GST NO</label><input type="text" id="GST_No" name="GST_No" class="w-full p-2 border border-gray-300 rounded bg-white uppercase font-mono text-sm"></div>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Payment Mode</label>
-                        <select id="Payment_Mode" name="Payment_Mode" class="w-full p-2 border border-gray-300 rounded-lg">
-                            <option value="Cash">Cash</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="UPI">UPI</option>
-                            <option value="Cheque">Cheque</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Receipt/Doc Link</label>
-                        <input type="url" id="Doc_Link" name="Doc_Link" class="w-full p-2 border border-gray-300 rounded-lg text-blue-600" placeholder="https://...">
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Mobile (+91)</label><input type="tel" id="Mobile_No" name="Mobile_No" class="w-full p-2 border border-gray-300 rounded-lg"></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Email</label><input type="email" id="Email" name="Email" class="w-full p-2 border border-gray-300 rounded-lg"></div>
                 </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Notes</label>
-                    <input type="text" id="Notes" name="Notes" class="w-full p-2 border border-gray-300 rounded-lg">
+                <div><label class="text-xs font-bold text-gray-500 uppercase mb-1 block">Full Address</label><textarea id="Address" name="Address" rows="2" class="w-full p-2 border border-gray-300 rounded-lg text-sm"></textarea></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Google Drive Link</label><input type="url" id="Folder_Link" name="Folder_Link" class="w-full p-2 border border-gray-300 rounded-lg text-blue-600 text-sm"></div>
+                    <div><label class="text-xs font-bold text-gray-500 uppercase">Notes</label><input type="text" id="Notes" name="Notes" class="w-full p-2 border border-gray-300 rounded-lg"></div>
                 </div>
-
                 <div class="pt-4 flex gap-3">
-                    <button type="submit" id="saveBtn" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-bold py-3 rounded-xl shadow-md transition">Save Entry</button>
-                    <button type="button" onclick="closeModal()" class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition">Cancel</button>
+                    <button type="submit" id="saveBtn" class="flex-1 bg-red-700 hover:bg-red-800 text-white font-bold py-3 rounded-xl shadow-md transition">Save Client</button>
+                    <button type="button" onclick="closeClientModal()" class="px-6 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold rounded-xl transition">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        // *** Updated URL ***
+        // *** UPDATED URL ***
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzgYb_qht1HHfKQRgHEua0kiE46NjrToJCPF8C6AxI9vD8AlqSkMVWzqXphWfXFVbk_/exec"; 
         
-        let allData = [];
+        let clientData = [];
+        let nextClientId = "";
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('Date').valueAsDate = new Date();
-            fetchData();
-        });
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+            
+            if (u === "cmeg1111" && p === "Cmeg@3655") {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('flex');
+                fetchClients();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
 
-        async function fetchData() {
+        function logout() { location.reload(); }
+        function showSection(id) {
+            document.querySelectorAll('[id^="section-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`section-${id}`).classList.remove('hidden');
+        }
+
+        async function fetchClients() {
             try {
-                // Request 'accounts' type data from the combined script
-                const res = await fetch(SCRIPT_URL + "?type=accounts");
+                // Fetch CLIENTS by default (or ?type=clients)
+                const res = await fetch(SCRIPT_URL + "?type=clients");
                 const json = await res.json();
-                allData = json.data;
-                updateSummary(json.summary);
-                renderTable(allData);
-                document.getElementById('recordCount').innerText = `${allData.length} records`;
+                clientData = json.data;
+                nextClientId = json.nextId;
+                renderClients(clientData);
             } catch (err) {
                 console.error(err);
-                document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" class="p-6 text-center text-red-500">Failed to load data.</td></tr>`;
+                document.getElementById('clientTableBody').innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Connection Error</td></tr>`;
             }
         }
 
-        function updateSummary(sum) {
-            if(!sum) return;
-            document.getElementById('dispIncome').innerText = `₹${sum.income.toLocaleString()}`;
-            document.getElementById('dispExpense').innerText = `₹${sum.expense.toLocaleString()}`;
-            document.getElementById('dispBalance').innerText = `₹${sum.balance.toLocaleString()}`;
-            
-            const balEl = document.getElementById('dispBalance');
-            if(sum.balance >= 0) balEl.className = "text-2xl font-bold text-green-700";
-            else balEl.className = "text-2xl font-bold text-red-700";
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
+        function renderClients(data) {
+            const tbody = document.getElementById('clientTableBody');
             tbody.innerHTML = "";
-            
             if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-400">No entries found</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-400">No clients found</td></tr>`;
                 return;
             }
-
-            const sorted = [...data].sort((a,b) => new Date(b.Date) - new Date(a.Date));
-
-            sorted.forEach(row => {
-                const isIncome = row.Txn_Type === 'Income';
-                const amtColor = isIncome ? 'text-green-600' : 'text-red-600';
-                const sign = isIncome ? '+' : '-';
-                
-                let dateStr = row.Date;
-                try { dateStr = new Date(row.Date).toLocaleDateString('en-IN'); } catch(e){}
-
+            data.reverse().forEach(c => {
                 const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition border-b border-gray-50 last:border-0";
                 tr.innerHTML = `
-                    <td class="px-4 py-3 text-gray-600 whitespace-nowrap">${dateStr}</td>
+                    <td class="px-4 py-3 font-mono font-bold text-red-700 whitespace-nowrap">${c.Client_ID}</td>
                     <td class="px-4 py-3">
-                        <div class="font-bold text-gray-800">${row.Particulars}</div>
-                        ${row.Client_Name ? `<div class="text-xs text-gray-500">${row.Client_Name}</div>` : ''}
+                        <div class="font-bold text-gray-800">${c.Client_Name}</div>
+                        <div class="text-[10px] uppercase tracking-wider text-gray-400 bg-gray-100 inline-block px-1 rounded mt-1">${c.Branch || 'Main'}</div>
                     </td>
-                    <td class="px-4 py-3 text-xs"><span class="bg-gray-100 px-2 py-1 rounded text-gray-600">${row.Category}</span></td>
-                    <td class="px-4 py-3 text-xs font-bold ${isIncome ? 'text-green-600' : 'text-red-500'} uppercase">${row.Txn_Type}</td>
-                    <td class="px-4 py-3 text-right font-mono font-bold ${amtColor}">${sign}₹${Number(row.Amount).toLocaleString()}</td>
+                    <td class="px-4 py-3 text-xs text-gray-500">
+                        ${c.Mobile_No ? `<div><i class="fas fa-phone mr-1"></i>${c.Mobile_No}</div>` : ''}
+                        ${c.Email ? `<div class="truncate max-w-[150px]"><i class="fas fa-envelope mr-1"></i>${c.Email}</div>` : ''}
+                    </td>
+                    <td class="px-4 py-3 text-xs font-mono text-gray-600">
+                        ${c.GST_No ? `<div class="text-blue-600">G: ${c.GST_No}</div>` : ''}
+                        ${c.Pan_No ? `<div>P: ${c.Pan_No}</div>` : ''}
+                    </td>
                     <td class="px-4 py-3 text-center">
-                        ${row.Doc_Link ? `<a href="${row.Doc_Link}" target="_blank" class="text-blue-500 hover:text-blue-700"><i class="fas fa-paperclip"></i></a>` : '-'}
+                        ${c.Folder_Link ? `<a href="${c.Folder_Link}" target="_blank" class="text-green-600 hover:scale-110 transition inline-block"><i class="fab fa-google-drive text-lg"></i></a>` : '<span class="text-gray-200">-</span>'}
                     </td>
                     <td class="px-4 py-3 text-right">
-                        <button onclick='openModal("edit", ${JSON.stringify(row).replace(/'/g, "&#39;")})' class="text-gray-400 hover:text-blue-600 p-1"><i class="fas fa-edit"></i></button>
+                        <button onclick='openClientModal("edit", ${JSON.stringify(c).replace(/'/g, "&#39;")})' class="text-gray-400 hover:text-blue-600 p-2"><i class="fas fa-edit"></i></button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function applyFilters() {
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const type = document.getElementById('filterType').value;
-            
-            const filtered = allData.filter(item => {
-                const matchesSearch = (item.Particulars && item.Particulars.toLowerCase().includes(term)) ||
-                                      (item.Client_Name && item.Client_Name.toLowerCase().includes(term)) ||
-                                      (item.Category && item.Category.toLowerCase().includes(term));
-                const matchesType = type === "All" || item.Txn_Type === type;
-                return matchesSearch && matchesType;
-            });
-            renderTable(filtered);
-        }
-        
-        document.getElementById('searchInput').addEventListener('keyup', applyFilters);
+        document.getElementById('clientSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = clientData.filter(item => 
+                (item.Client_Name && item.Client_Name.toLowerCase().includes(term)) ||
+                (item.Client_ID && item.Client_ID.toLowerCase().includes(term)) ||
+                (item.GST_No && item.GST_No.toLowerCase().includes(term))
+            );
+            renderClients(filtered);
+        });
 
-        function openModal(mode, data = null) {
-            const modal = document.getElementById('entryModal');
-            const form = document.getElementById('entryForm');
+        function openClientModal(mode, data = null) {
+            const modal = document.getElementById('clientModal');
+            const form = document.getElementById('clientForm');
             form.reset();
-            
             modal.classList.remove('hidden');
-            
             if (mode === 'add') {
-                document.getElementById('modalTitle').innerText = "New Entry";
+                document.getElementById('modalTitle').innerText = "Add New Client";
+                document.getElementById('Client_ID').value = nextClientId;
                 document.getElementById('rowIndex').value = "";
-                document.getElementById('Date').valueAsDate = new Date();
             } else {
-                document.getElementById('modalTitle').innerText = "Edit Entry";
+                document.getElementById('modalTitle').innerText = "Edit Client";
                 document.getElementById('rowIndex').value = data.rowIndex;
-                
-                Object.keys(data).forEach(k => {
-                    const el = document.getElementById(k);
+                Object.keys(data).forEach(key => {
+                    const el = document.getElementById(key);
                     if(el) {
-                        if(k === 'Date') {
-                            try { el.value = new Date(data[k]).toISOString().split('T')[0]; } catch(e){ el.value=data[k]; }
+                        if(key === 'DOB' && data[key]) {
+                            try { el.value = new Date(data[key]).toISOString().split('T')[0]; } 
+                            catch(e) { el.value = data[key]; }
                         } else {
-                            el.value = data[k];
+                            el.value = data[key];
                         }
                     }
                 });
             }
         }
 
-        function closeModal() {
-            document.getElementById('entryModal').classList.add('hidden');
+        function closeClientModal() {
+            document.getElementById('clientModal').classList.add('hidden');
         }
 
-        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+        document.getElementById('clientForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
             const orig = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
             btn.disabled = true;
 
             const formData = new FormData(e.target);
             const dataObj = Object.fromEntries(formData.entries());
-            dataObj.action = dataObj.rowIndex ? "editTransaction" : "addTransaction";
+            dataObj.action = dataObj.rowIndex ? "editClient" : "addClient"; 
 
             try {
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(dataObj)
                 });
-                closeModal();
-                fetchData();
+                closeClientModal();
+                fetchClients(); 
             } catch (err) {
                 alert("Error saving data");
+                console.error(err);
             } finally {
                 btn.innerHTML = orig;
                 btn.disabled = false;
