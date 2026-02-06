@@ -1,6 +1,20 @@
-<link rel="manifest" href="manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#b91c1c">
-<link rel="apple-touch-icon" href="logocmbooks.png">
+{
+  "name": "cmBOOKS",
+  "short_name": "cmBOOKS",
+  "start_url": "cmbooks.html",
+  "display": "standalone",
+  "background_color": "#f3f4f6",
+  "theme_color": "#b91c1c",
+  "icons": [
+    {
+      "src": "logocmbooks.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logocmbooks.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
