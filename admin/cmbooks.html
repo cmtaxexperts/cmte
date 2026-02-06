@@ -8,27 +8,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* --- CORE THEME: RED & GREY [3] --- */
+        /* --- CORE THEME: RED & GREY --- */
         :root {
-            --primary: #1e293b; /* Slate 800 */
-            --accent: #b91c1c;   /* CM Red */
-            --accent-dark: #991b1b; /* Darker Red */
-            --bg-light: #f8fafc; /* Slate 50 */
+            --primary: #1e293b; 
+            --accent: #b91c1c;   
+            --bg-light: #f8fafc; 
         }
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: var(--bg-light); color: var(--primary); }
-        
-        /* Login Gradient - Red Theme [3] */
-        .login-bg { background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%); }
         
         /* Utilities */
         .card-hover { transition: transform 0.2s, box-shadow 0.2s; }
         .card-hover:active { transform: scale(0.98); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        /* Red Loader [3] */
         .loader { width: 20px; height: 20px; border: 2px solid #e2e8f0; border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* Transitions */
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -39,32 +32,7 @@
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
 
-    <div id="view-login" class="fixed inset-0 z-50 login-bg flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
-            <div class="w-20 h-20 mx-auto flex items-center justify-center mb-4">
-                <img src="logocmbooks.png" class="w-full h-full object-contain" alt="CMbooks Logo">
-            </div>
-            <h1 class="text-2xl font-bold text-slate-800 mb-1">CMbooks</h1>
-            <p class="text-xs text-slate-400 mb-8 uppercase tracking-widest">Professional Workspace</p>
-            
-            <form onsubmit="app.login(event)" class="space-y-4">
-                <div class="relative">
-                    <i class="fas fa-user absolute left-3 top-3.5 text-gray-400"></i>
-                    <input type="text" id="user" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-red-700 transition" placeholder="Username" required>
-                </div>
-                <div class="relative">
-                    <i class="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
-                    <input type="password" id="pass" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-red-700 transition" placeholder="Password" required>
-                </div>
-                <button type="submit" class="w-full btn-red py-3 rounded-xl text-sm">
-                    Login
-                </button>
-            </form>
-            <p id="login-msg" class="text-red-600 text-xs mt-3 hidden font-semibold">Invalid Credentials</p>
-        </div>
-    </div>
-
-    <div id="view-app" class="hidden flex-col h-full">
+    <div id="view-app" class="flex flex-col h-full">
         
         <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 z-40 shrink-0">
             <div class="flex items-center gap-3 cursor-pointer" onclick="app.nav('dashboard')">
@@ -74,8 +42,8 @@
                     <p id="page-title" class="text-[10px] text-red-700 font-bold uppercase tracking-wider">Dashboard</p>
                 </div>
             </div>
-            <button onclick="app.logout()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-slate-400 transition" title="Logout">
-                <i class="fas fa-power-off"></i>
+            <button onclick="location.reload()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-slate-400 transition" title="Refresh">
+                <i class="fas fa-sync-alt"></i>
             </button>
         </header>
 
@@ -103,7 +71,7 @@
                         <div class="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl"><i class="fas fa-key"></i></div>
                         <span class="font-bold text-slate-700">Credentials</span>
                     </div>
-                     <div onclick="app.nav('payment')" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 cursor-pointer flex flex-col items-center justify-center gap-4 h-40">
+                    <div onclick="app.nav('payment')" class="card-hover bg-white p-6 rounded-2xl shadow-sm border border-slate-100 cursor-pointer flex flex-col items-center justify-center gap-4 h-40">
                         <div class="w-14 h-14 rounded-full bg-red-50 text-red-700 flex items-center justify-center text-2xl"><i class="fas fa-link"></i></div>
                         <span class="font-bold text-slate-700">Payment Link</span>
                     </div>
@@ -281,19 +249,6 @@
 
         // APP CONTROLLER
         const app = {
-            login: (e) => {
-                e.preventDefault();
-                const u = document.getElementById('user').value;
-                const p = document.getElementById('password').value;
-                if(u === "cmeg1111" && p === "Cmeg@3655") {
-                    document.getElementById('view-login').classList.add('hidden');
-                    document.getElementById('view-app').classList.remove('hidden');
-                    document.getElementById('view-app').classList.add('flex');
-                } else {
-                    document.getElementById('login-msg').classList.remove('hidden');
-                }
-            },
-            logout: () => location.reload(),
             nav: (mod) => {
                 const modules = ['dashboard', 'clients', 'accounts', 'compliance', 'invoice', 'credentials', 'payment', 'placeholder'];
                 modules.forEach(m => {
@@ -301,7 +256,6 @@
                     if(el) el.classList.add('hidden');
                 });
 
-                // Update Title & Navigation logic
                 let title = mod.charAt(0).toUpperCase() + mod.slice(1);
                 document.getElementById('page-title').innerText = title;
 
