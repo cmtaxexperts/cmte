@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CM Tax Experts – Invoice & Payment Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body{
+      margin:0;
+      font-family:'Inter',system-ui,sans-serif;
+      background:#f5f5f5;
+      color:#333;
+    }
+    .container{
+      max-width:480px;
+      margin:auto;
+      padding:20px;
+    }
+    .card{
+      background:#fff;
+      border-radius:16px;
+      padding:20px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+      margin-bottom:20px;
+    }
+    h1{
+      font-size:22px;
+      margin-bottom:6px;
+      color:#b91c1c;
+    }
+    .sub{
+      font-size:13px;
+      color:#666;
+      margin-bottom:20px;
+    }
+    label{
+      font-size:13px;
+      font-weight:600;
+      margin-top:12px;
+      display:block;
+    }
+    input,select{
+      width:100%;
+      padding:12px;
+      margin-top:6px;
+      border-radius:10px;
+      border:1px solid #ddd;
+      font-size:14px;
+    }
+    input:focus,select:focus{
+      outline:none;
+      border-color:#b91c1c;
+    }
+    .row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    button{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:30px;
+      background:#b91c1c;
+      color:#fff;
+      font-weight:700;
+      font-size:15px;
+      margin-top:18px;
+      cursor:pointer;
+    }
+    button.secondary{
+      background:#444;
+    }
+    .preview{
+      background:#fff4f4;
+      border:1px dashed #b91c1c;
+      padding:14px;
+      border-radius:12px;
+      font-size:13px;
+      margin-top:12px;
+      white-space:pre-line;
+    }
+    .small{
+      font-size:12px;
+      color:#666;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="card">
+    <h1>Invoice & Payment Builder</h1>
+    <div class="sub">CM Tax Experts – Admin Panel</div>
+
+    <label>Client Name</label>
+    <input id="clientName" placeholder="Client Name">
+
+    <label>Client ID</label>
+    <input id="clientId" placeholder="C40327">
+
+    <label>Description</label>
+    <select id="desc">
+      <option>GST Return Fee</option>
+      <option>TDS Return Fee</option>
+      <option>GST & EPF</option>
+      <option>GST & TDS</option>
+      <option>Other</option>
+    </select>
+
+    <label>Period</label>
+    <select id="period">
+      <option>January 2026</option>
+      <option>February 2026</option>
+      <option>March 2026</option>
+    </select>
+
+    <div class="row">
+      <div>
+        <label>Amount (₹)</label>
+        <input id="amount" type="number" placeholder="4500">
+      </div>
+      <div>
+        <label>Invoice No</label>
+        <input id="inv" placeholder="PI4260039">
+      </div>
+    </div>
+
+    <label>UPI ID</label>
+    <input id="upi" value="cmtaxexperts@ybl">
+
+    <button onclick="generate()">Generate Invoice</button>
+  </div>
+
+  <div class="card">
+    <h1>Generated Output</h1>
+    <div id="output" class="preview small">Fill details and click Generate</div>
+
+    <button class="secondary" onclick="sendWhatsApp()">Send via WhatsApp</button>
+  </div>
+
+</div>
+
+<script>
+function numberToWords(num){
+  const a = [
+    '', 'One','Two','Three','Four','Five','Six','Seven','Eight','Nine',
+    'Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen',
+    'Sixteen','Seventeen','Eighteen','Nineteen'
+  ];
+  const b = ['', '', 'Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  if(num === 0) return 'Zero';
+  if(num < 20) return a[num];
+  if(num < 100) return b[Math.floor(num/10)] + (num%10 ? ' ' + a[num%10] : '');
+  if(num < 1000) return a[Math.floor(num/100)] + ' Hundred ' + numberToWords(num%100);
+  if(num < 100000) return numberToWords(Math.floor(num/1000)) + ' Thousand ' + numberToWords(num%1000);
+  return '';
+}
+
+let paymentLink = '';
+let waMessage = '';
+
+function generate(){
+  const name = document.getElementById('clientName').value;
+  const id = document.getElementById('clientId').value;
+  const desc = document.getElementById('desc').value;
+  const period = document.getElementById('period').value;
+  const amt = document.getElementById('amount').value;
+  const inv = document.getElementById('inv').value;
+  const upi = document.getElementById('upi').value;
+
+  const words = numberToWords(parseInt(amt)) + ' Rupees Only';
+
+  paymentLink =
+    `https://cmtaxexperts.com/admin/payment/?name=${encodeURIComponent(name)}&id=${id}&desc=${encodeURIComponent(desc)}&period=${encodeURIComponent(period)}&amt=${amt}&inv=${inv}&upi=${upi}`;
+
+  waMessage =
+`Dear ${name},
+
+Invoice No: ${inv}
+Client ID: ${id}
+Particular: ${desc}
+Period: ${period}
+
+Amount Payable: ₹${amt}
+(${words})
+
+Click below to view invoice & pay:
+${paymentLink}
+
+— CM Tax Experts`;
+
+  document.getElementById('output').innerText =
+`Client: ${name}
+ID: ${id}
+Invoice: ${inv}
+
+${desc}
+Period: ${period}
+
+Amount: ₹${amt}
+(${words})
+
+Client Link:
+${paymentLink}`;
+}
+
+function sendWhatsApp(){
+  if(!waMessage){
+    alert("Generate invoice first");
+    return;
+  }
+  const url = "https://wa.me/?text=" + encodeURIComponent(waMessage);
+  window.open(url, "_blank");
+}
+</script>
+
+</body>
+</html>
